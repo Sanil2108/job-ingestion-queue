@@ -23,5 +23,7 @@
     app.use('/files', fileRouter);
 
     app.listen(process.env.PORT, () => console.log(`Listening on PORT ${process.env.PORT}`));
+
+    app.use(require('./utils/errorHandler'));
   }
 )();

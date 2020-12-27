@@ -32,12 +32,14 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:fileId", async (req, res) => {
-  const fileData = await dataDriver.getFileData({ fileId: req.params.fileId });
-  const allRecords = fileData.upload_complete
-    ? await dataDriver.getAllRecordsOfFile({ fileId: req.params.fileId })
-    : null;
+  const fileData = (await dataDriver.getFileData({ fileId: req.params.fileId })).results[0];
+  let allRecords = undefined;
 
-  res.json({ fileData: fileData.results[0], records: allRecords });
+  if (fileData && fileData.upload_complete) {
+    allRecords = (await dataDriver.getAllRecordsOfFile({ fileId: req.params.fileId })).results;
+  }
+  
+  res.json({ fileData, records: allRecords });
 });
 
 module.exports = router;

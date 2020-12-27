@@ -67,7 +67,7 @@ async function getFileData({fileId}) {
 
 async function getAllRecordsOfFile({fileId}) {
   const query = "SELECT * from data_item where file_id = ?;";
-  const variables = [fileId, fileId];
+  const variables = [fileId];
 
   return await promisifyQuery(query, variables);
 }
