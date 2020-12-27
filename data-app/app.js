@@ -5,7 +5,7 @@ const rabbitMqDriver = require('./drivers/rabbitmqDriver');
 
 async function init () {
   console.log('Waiting for services to start up...');
-  await new Promise(r => setTimeout(r, 10 * 1000));
+  await new Promise(r => setTimeout(r, 30 * 1000));
 
   await rabbitMqDriver.setupConnection();
   await dataDriver.setupDatabaseConnection();

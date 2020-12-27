@@ -46,7 +46,7 @@ async function getLastInsertedFile() {
 }
 
 async function insertFile({ fileName }) {
-  const query = "INSERT INTO file_data (file_name, upload_complete) VALUES (?, false);";
+  const query = "INSERT INTO file_data (file_name, upload_complete, total_records) VALUES (?, false, NULL);";
   const variables = [fileName];
 
   return await promisifyQuery(query, variables);
@@ -59,8 +59,15 @@ async function getListOfFiles() {
 }
 
 async function getFileData({fileId}) {
-  const query = "SELECT * FROM file_data WHERE id = ?;";
-  const variables = [fileId];
+  const query = "SELECT *, (SELECT COUNT(*) FROM data_item where file_id = ?) AS count from file_data where id = ?;";
+  const variables = [fileId, fileId];
+
+  return await promisifyQuery(query, variables);
+}
+
+async function getAllRecordsOfFile({fileId}) {
+  const query = "SELECT * from data_item where file_id = ?;";
+  const variables = [fileId, fileId];
 
   return await promisifyQuery(query, variables);
 }
@@ -68,6 +75,7 @@ async function getFileData({fileId}) {
 module.exports = {
   getListOfFiles,
   getFileData,
+  getAllRecordsOfFile,
   insertFile,
   getLastInsertedFile,
   init,

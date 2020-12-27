@@ -3,8 +3,8 @@
     const fileUpload = require('express-fileupload');
     require('dotenv').config();
 
-    console.log('Waiting for RabbitMQ service to start up...');
-    await new Promise(r => setTimeout(r, 10 * 1000));
+    console.log('Waiting for services to start up...');
+    await new Promise(r => setTimeout(r, 30 * 1000));
     
     const { init: initQueue } = require('./utils/queueHandler');
     initQueue();

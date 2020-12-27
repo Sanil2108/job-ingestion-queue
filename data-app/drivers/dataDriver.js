@@ -5,6 +5,7 @@ let connection = null;
 
 function setupDatabaseConnection() {
   connection = mysql.createConnection({
+    debug: true,
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
@@ -43,45 +44,58 @@ async function insertDataItemToDatabase({ uid, platform, fileId }) {
   const query = "INSERT INTO data_item (uid, platform, file_id) VALUES (?, ?, ?);";
   const variables = [uid, platform, fileId];
 
-  const {results, fields} = promisifyQuery(query, variables);
+  await promisifyQuery(query, variables);
 }
 
-async function insertFile({ fileName }) {
-  const query = "INSERT INTO file_data (file_name) VALUES (?);";
-  const variables = [fileName];
+async function setFileNumberOfRecords({ fileId, numberOfRecords }) {
+  const query = "UPDATE file_data SET total_records = ? WHERE id = ?;";
+  const variables = [numberOfRecords, fileId];
 
-  const {results, fields} = promisifyQuery(query, variables);
+  await promisifyQuery(query, variables);
 }
 
-async function insertDataArrayToDatabase({ dataArray, fileName }) {
+async function setFileUploadComplete({ fileId }) {
+  const query = "UPDATE file_data SET upload_complete = true WHERE id = ?;";
+  const variables = [fileId];
+
+  await promisifyQuery(query, variables);
+}
+
+async function insertDataArrayToDatabase({ dataArray, fileId }) {
   for (let i = 0; i < dataArray.length; i += 1) {
-    await insertDataItemToDatabase({ ...dataArray[i], fileName });
+    await insertDataItemToDatabase({ uid: dataArray[i][0], platform: dataArray[i][1], fileId });
   }
 }
 
 async function parseAndInsertFile(fileDataObj) {
-  const { fileName, fileContents } = fileDataObj;
+  const { fileId, fileContents } = fileDataObj;
 
-  await insertFile({ fileName });
-
-  const csvString = fileContents.toString();
-
+  const csvString = fileContents;
+  
   const dataArray = await new Promise((resolve, reject) => {
     parse(csvString, {}, (error, records) => {
       if (error) {
         reject(error);
         return;
       }
+      records.splice(0, 1);
       resolve(records);
     });
   });
 
+  await setFileNumberOfRecords({
+    fileId,
+    numberOfRecords: dataArray.length
+  })
+
   await insertDataArrayToDatabase({
     dataArray,
-    fileName
+    fileId
   });
 
-  // console.log(records);
+  await setFileUploadComplete({
+    fileId
+  })
 }
 
 module.exports = {

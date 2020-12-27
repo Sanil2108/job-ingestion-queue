@@ -2,6 +2,7 @@ const dataDriver = require('./dataDriver');
 
 function onReceiveMessage (message) {
   const messageObj = JSON.parse(message.content.toString());
+  
   dataDriver[messageObj.type](messageObj.payload);
 }
 

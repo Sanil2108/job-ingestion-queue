@@ -1,5 +1,5 @@
 const { sendMessageToQueue } = require("../../utils/queueHandler");
-const dataDriver = require('../../utils/dataDriver');
+const dataDriver = require("../../utils/dataDriver");
 
 const router = require("express").Router();
 
@@ -7,32 +7,37 @@ const router = require("express").Router();
 router.post("/", async (req, res) => {
   const file = req.files[Object.keys(req.files)[0]];
 
-  // Add entry to database that the file has been added and is pending upload
-  await dataDriver.insertFile({fileName: file.name});
+  await dataDriver.insertFile({ fileName: file.name });
   const savedFileData = await dataDriver.getLastInsertedFile();
-  
-  // Get back the id from rabbitmq and send it to the user
+
   sendMessageToQueue({
-    type: 'parseAndInsertFile',
+    type: "parseAndInsertFile",
     payload: {
       fileId: savedFileData.results[0].id,
-      fileContents: file.data
-    }
+      fileContents: file.data.toString(),
+    },
   });
 
-  res.status(200).send();
+  res.status(200).send(
+    JSON.stringify({
+      fileId: savedFileData.results[0].id,
+    })
+  );
 });
 
 router.get("/", async (req, res) => {
   const fileData = await dataDriver.getListOfFiles();
 
-  res.send(JSON.stringify(fileData.results));
+  res.json(fileData.results);
 });
 
 router.get("/:fileId", async (req, res) => {
-  const fileData = await dataDriver.getFileData({fileId: req.params.fileId});
+  const fileData = await dataDriver.getFileData({ fileId: req.params.fileId });
+  const allRecords = fileData.upload_complete
+    ? await dataDriver.getAllRecordsOfFile({ fileId: req.params.fileId })
+    : null;
 
-  res.send(JSON.stringify(fileData.results[0]));
+  res.json({ fileData: fileData.results[0], records: allRecords });
 });
 
 module.exports = router;
