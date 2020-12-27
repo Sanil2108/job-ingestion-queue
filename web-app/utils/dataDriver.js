@@ -55,14 +55,14 @@ async function insertFile({ fileName }) {
 
 async function getListOfFiles() {
   const query =
-    "SELECT * FROM file_data INNER JOIN (SELECT COUNT(*), di.file_id FROM data_item di GROUP BY di.file_id) di on file_data.id = di.file_id;";
+    "SELECT * FROM file_data INNER JOIN (SELECT COUNT(*) as uploaded, di.file_id FROM data_item di GROUP BY di.file_id) di on file_data.id = di.file_id;";
 
   return await promisifyQuery(query);
 }
 
 async function getFileData({ fileId }) {
   const query =
-    "SELECT *, (SELECT COUNT(*) FROM data_item where file_id = ?) AS count from file_data where id = ?;";
+    "SELECT *, (SELECT COUNT(*) as uploaded FROM data_item where file_id = ?) AS count from file_data where id = ?;";
   const variables = [fileId, fileId];
 
   return await promisifyQuery(query, variables);
