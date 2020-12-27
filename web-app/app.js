@@ -13,6 +13,8 @@
     initDatabase();
 
     const app = require('express')();
+    
+    app.use(require('cors')())
 
     app.use(fileUpload({
       limits: { fileSize: 50 * 1024 * 1024 },

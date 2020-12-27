@@ -18,11 +18,9 @@ router.post("/", async (req, res) => {
     },
   });
 
-  res.status(200).send(
-    JSON.stringify({
-      fileId: savedFileData.results[0].id,
-    })
-  );
+  res.status(200).json({
+    fileId: savedFileData.results[0].id,
+  });
 });
 
 router.get("/", async (req, res) => {
@@ -32,13 +30,16 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:fileId", async (req, res) => {
-  const fileData = (await dataDriver.getFileData({ fileId: req.params.fileId })).results[0];
+  const fileData = (await dataDriver.getFileData({ fileId: req.params.fileId }))
+    .results[0];
   let allRecords = undefined;
 
   if (fileData && fileData.upload_complete) {
-    allRecords = (await dataDriver.getAllRecordsOfFile({ fileId: req.params.fileId })).results;
+    allRecords = (
+      await dataDriver.getAllRecordsOfFile({ fileId: req.params.fileId })
+    ).results;
   }
-  
+
   res.json({ fileData, records: allRecords });
 });
 
