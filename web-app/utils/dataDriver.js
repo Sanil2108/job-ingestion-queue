@@ -41,31 +41,34 @@ async function promisifyQuery(sqlQuery, variables = []) {
 
 async function getLastInsertedFile() {
   const query = "SELECT * FROM file_data WHERE id = LAST_INSERT_ID();";
-  
+
   return await promisifyQuery(query);
 }
 
 async function insertFile({ fileName }) {
-  const query = "INSERT INTO file_data (file_name, upload_complete, total_records) VALUES (?, false, NULL);";
+  const query =
+    "INSERT INTO file_data (file_name, upload_complete, total_records) VALUES (?, false, NULL);";
   const variables = [fileName];
 
   return await promisifyQuery(query, variables);
 }
 
 async function getListOfFiles() {
-  const query = "SELECT * FROM file_data;";
+  const query =
+    "SELECT * FROM file_data INNER JOIN (SELECT COUNT(*), di.file_id FROM data_item di GROUP BY di.file_id) di on file_data.id = di.file_id;";
 
   return await promisifyQuery(query);
 }
 
-async function getFileData({fileId}) {
-  const query = "SELECT *, (SELECT COUNT(*) FROM data_item where file_id = ?) AS count from file_data where id = ?;";
+async function getFileData({ fileId }) {
+  const query =
+    "SELECT *, (SELECT COUNT(*) FROM data_item where file_id = ?) AS count from file_data where id = ?;";
   const variables = [fileId, fileId];
 
   return await promisifyQuery(query, variables);
 }
 
-async function getAllRecordsOfFile({fileId}) {
+async function getAllRecordsOfFile({ fileId }) {
   const query = "SELECT * from data_item where file_id = ?;";
   const variables = [fileId];
 
