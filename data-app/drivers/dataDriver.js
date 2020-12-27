@@ -47,7 +47,7 @@ async function insertDataItemToDatabase({ uid, platform, fileId }) {
 }
 
 async function insertFile({ fileName }) {
-  const query = "INSERT INTO file (file_name) VALUES (?);";
+  const query = "INSERT INTO file_data (file_name) VALUES (?);";
   const variables = [fileName];
 
   const {results, fields} = promisifyQuery(query, variables);
