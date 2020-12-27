@@ -3,11 +3,11 @@
     const fileUpload = require('express-fileupload');
     require('dotenv').config();
 
-    // console.log('Waiting for RabbitMQ service to start up...');
-    // await new Promise(r => setTimeout(r, 10 * 1000));
+    console.log('Waiting for RabbitMQ service to start up...');
+    await new Promise(r => setTimeout(r, 10 * 1000));
     
-    // const { initQueue } = require('./utils/queueHandler');
-    // initQueue();
+    const { initQueue } = require('./utils/queueHandler');
+    initQueue();
 
     const {init: initDatabase} = require('./utils/dataDriver');
     initDatabase();

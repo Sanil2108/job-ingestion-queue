@@ -31,7 +31,7 @@ services:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password --init-file /data/application/init.sql
     volumes:
-        - ./data-app/drivers/init.sql:/data/application/init.sql
+        - ./data-app/init.sql:/data/application/init.sql
     restart: always
     ports:
       - "3306:3306"

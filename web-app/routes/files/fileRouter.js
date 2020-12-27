@@ -12,13 +12,13 @@ router.post("/", async (req, res) => {
   const savedFileData = await dataDriver.getLastInsertedFile();
   
   // Get back the id from rabbitmq and send it to the user
-  // sendMessageToQueue({
-  //   type: 'parseAndInsertFile',
-  //   payload: {
-  //     fileId: savedFileData.results[0].id,
-  //     fileContents: file.data
-  //   }
-  // });
+  sendMessageToQueue({
+    type: 'parseAndInsertFile',
+    payload: {
+      fileId: savedFileData.results[0].id,
+      fileContents: file.data
+    }
+  });
 
   res.status(200).send();
 });

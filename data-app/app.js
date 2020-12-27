@@ -7,7 +7,7 @@ async function init () {
   console.log('Waiting for services to start up...');
   await new Promise(r => setTimeout(r, 10 * 1000));
 
-  // await rabbitMqDriver.setupConnection();
+  await rabbitMqDriver.setupConnection();
   await dataDriver.setupDatabaseConnection();
 }
 
