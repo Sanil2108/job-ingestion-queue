@@ -1,10 +1,21 @@
-require('dotenv').config();
-const app = require('express')();
+(
+  async () => {
+    console.log('Waiting for RabbitMQ service to start up...');
+    await new Promise(r => setTimeout(r, 10 * 1000));
+    
+    require('dotenv').config();
 
-const fileRouter = require('./routes/files/fileRouter');
-const jobRouter = require('./routes/jobs/jobRouter');
+    const { init } = require('./utils/queueHandler');
+    init();
 
-app.use('/files', fileRouter);
-app.use('/jobs', jobRouter);
+    const app = require('express')();
 
-app.listen(process.env.PORT, () => console.log(`Listening on PORT ${process.env.PORT}`));
+    const fileRouter = require('./routes/files/fileRouter');
+    const jobRouter = require('./routes/jobs/jobRouter');
+
+    app.use('/files', fileRouter);
+    app.use('/jobs', jobRouter);
+
+    app.listen(process.env.PORT, () => console.log(`Listening on PORT ${process.env.PORT}`));
+  }
+)();

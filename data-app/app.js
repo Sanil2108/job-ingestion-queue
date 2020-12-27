@@ -1,7 +1,10 @@
 require("dotenv").config();
 
+const driver = require('./data/driver');
+
 function onReceiveMessage (message) {
-  console.log(Buffer.from(message));
+  const messageObj = JSON.parse(message.content.toString());
+  driver[messageObj.type](messageObj.payload);
 }
 
 async function init () {
